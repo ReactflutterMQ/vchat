@@ -1,8 +1,8 @@
 <template>
     <div class="conversation-list">
         <div class="item border-gray-300 border-t cursor-pointer bg-white hover:bg-gray-200 p-2" v-for="item in items"
-            :key="item.id" @click="toConversation">
-            <a href="#">
+            :key="item.id" @click="goToConversation(item.id)"><!-- @click="toConversation" -->
+            <a href="#"><!-- @click.prevent="goToConversation(item.id)" -->
                 <div class=" flex justify-between items-center text-sm leading-5 text-gray-500">
                     <span>{{ item.selectedModel }}</span>
                     <span>{{ item.updatedAt }}</span>
@@ -18,7 +18,7 @@ import { useRouter } from 'vue-router';
 import { ConversationProps } from '../types';
 defineProps<{ items: ConversationProps[] }>();
 const router = useRouter();
-const toConversation = () => {
-    router.push('/conversation');
+const goToConversation = (id: number) => {
+    router.push({ path: `/conversation/${id}`, query: { name: 'viking' }, hash: '#foo' })
 }
 </script>
