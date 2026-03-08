@@ -21,6 +21,6 @@
 
 <script setup lang="ts">
 import { Icon } from '@iconify/vue';
-import { MessageProps } from 'src/types';
+import { MessageProps } from '../types';
 defineProps<{ messages: MessageProps[] }>()
 </script>

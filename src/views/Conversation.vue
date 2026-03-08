@@ -16,7 +16,7 @@ import { ref, watch } from 'vue';
 import { useRoute } from 'vue-router';
 import MessageInput from '../components/MessageInput.vue';
 import MessageList from '../components/MessageList.vue';
-import { ConversationProps, MessageProps } from 'src/types';
+import { ConversationProps, MessageProps } from '../types';
 import { messages, conversations } from '../testData';
 const route = useRoute();
 const filteredMessages = ref<MessageProps[]>([]);

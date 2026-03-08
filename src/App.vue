@@ -31,7 +31,7 @@
                     <MessageInput />
                 </div>
             </div> -->
-            <Button color="purple" icon="radix-icons:gear" plain :loading="loading" @click="loading = !loading">Hello there</Button>
+            <!-- <Button color="purple" icon="radix-icons:gear" plain :loading="loading" @click="loading = !loading">Hello there</Button> -->
             <RouterView />
         </div>
     </div>
@@ -39,11 +39,9 @@
 
 <script setup lang="ts">
 import { ref } from 'vue';
-import { Icon } from '@iconify/vue'
-import Button from './components/Button.vue';
+import { Icon } from '@iconify/vue';
 import ConversationList from './components/ConversationList.vue';
 import { conversations } from './testData';
 const selectedModel = ref('')
-const loading = ref(false)
 console.log("WChat application loaded successfully!");
 </script>

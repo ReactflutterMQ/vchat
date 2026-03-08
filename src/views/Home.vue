@@ -14,7 +14,7 @@
 import { ref } from 'vue';
 import ProviderSelect from '../components/ProviderSelect.vue';
 import MessageInput from '../components/MessageInput.vue';
-import { ConversationProps, ProviderProps } from '../types';
+// import { ConversationProps, ProviderProps } from '../types';
 import { providers } from '../testData';
 const selectedModel = ref('');
 // const providers: ProviderProps[] = [

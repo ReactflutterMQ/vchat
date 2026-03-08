@@ -22,7 +22,7 @@ export const providers: ProviderProps[] = [
     createdAt: '2024-07-03',
     updatedAt: '2024-07-03'
   },
-  {     
+  {
     id: 3,
     name: 'deepseek', 
     title: 'DeepSeek',
