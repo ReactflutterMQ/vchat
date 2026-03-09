@@ -22,26 +22,32 @@
             </div>
         </div>
         <div class="h-full flex-1">
-            <!-- flex items-center -->
-            <!-- <div class="w-[80%] mx-auto h-full">
-                <div class="h-[85%] flex items-center">
-                    <ProviderSelect :items="providers" v-model="selectedModel" />
-                </div>
-                <div class="h-[15%] flex items-center">
-                    <MessageInput />
-                </div>
-            </div> -->
-            <!-- <Button color="purple" icon="radix-icons:gear" plain :loading="loading" @click="loading = !loading">Hello there</Button> -->
             <RouterView />
         </div>
     </div>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { onMounted, ref } from 'vue';
+import { conversations, providers } from './testData';
 import { Icon } from '@iconify/vue';
+import { db } from './db';
 import ConversationList from './components/ConversationList.vue';
-import { conversations } from './testData';
 const selectedModel = ref('')
 console.log("WChat application loaded successfully!");
+onMounted(async () => {
+    // 增加测试数据
+    // const insertedId = await db.providers.add(providers[0]);
+    // console.log('insertedId', insertedId);
+    // 查询
+    // const items = await db.providers.toArray();
+    // const items = await db.providers.where({ id: 1 }).toArray();//查询id为1得数据
+    // console.log('items', items);
+    // 更新
+    // const updatedItem = await db.providers.update(1, { desc: 'updated desc' });
+    // console.log('updatedItem', updatedItem);//返回索引1
+    // 删除
+    const deletedItem = await db.providers.delete(1);
+    console.log('deletedItem', deletedItem);//返回undefined，说明删除成功
+})
 </script>
