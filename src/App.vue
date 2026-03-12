@@ -2,7 +2,7 @@
     <div class=" flex items-center justify-between h-screen">
         <div class=" w-[300px] bg-gray-200 h-full border-r border-gray-300">
             <div class="h-[92%] overflow-y-auto">
-                <ConversationList :items="conversations" v-model="selectedModel" />
+                <ConversationList :items="conversations" />
             </div>
             <div class="h-[8%] grid grid-cols-2 gap-2 p-2">
                 <RouterLink to="/">
@@ -29,13 +29,16 @@
 
 <script setup lang="ts">
 import { onMounted, ref } from 'vue';
-import { conversations, providers } from './testData';
 import { Icon } from '@iconify/vue';
-import { db } from './db';
+import { db, initProviders } from './db';
+import { ConversationProps } from './types';
 import ConversationList from './components/ConversationList.vue';
-const selectedModel = ref('')
-console.log("WChat application loaded successfully!");
+// const selectedModel = ref('')
+const conversations = ref<ConversationProps[]>([])
 onMounted(async () => {
+    await initProviders();
+    conversations.value = await db.conversations.toArray();
+
     // 增加测试数据
     // const insertedId = await db.providers.add(providers[0]);
     // console.log('insertedId', insertedId);
@@ -47,7 +50,7 @@ onMounted(async () => {
     // const updatedItem = await db.providers.update(1, { desc: 'updated desc' });
     // console.log('updatedItem', updatedItem);//返回索引1
     // 删除
-    const deletedItem = await db.providers.delete(1);
-    console.log('deletedItem', deletedItem);//返回undefined，说明删除成功
+    // const deletedItem = await db.providers.delete(1);
+    // console.log('deletedItem', deletedItem);//返回undefined，说明删除成功
 })
 </script>
