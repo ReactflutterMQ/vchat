@@ -1,7 +1,7 @@
 <template>
     <div class="h-[10%] bg-gray-200 border-b border-gray-300 flex items-center px-3 justify-between">
         <h3 class="font-semibold text-gray-900">{{ conversation?.title }}</h3>
-        <span class="text-sm text-gray-500">{{ conversation?.updatedAt }}</span>
+        <span class="text-sm text-gray-500">{{ dayjs(conversation?.updatedAt).format('YYYY-MM-DD HH:mm:ss') }}</span>
     </div>
     <div class="w-[80%] mx-auto h-[75%] overflow-y-auto pt-2">
         <MessageList :messages="filteredMessages" />
@@ -12,8 +12,10 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from 'vue';
+import { onMounted, ref, watch } from 'vue';
 import { useRoute } from 'vue-router';
+import { db } from '../db';
+import dayjs from 'dayjs';
 import MessageInput from '../components/MessageInput.vue';
 import MessageList from '../components/MessageList.vue';
 import { ConversationProps, MessageProps } from '../types';
@@ -22,11 +24,30 @@ const route = useRoute();
 const filteredMessages = ref<MessageProps[]>([]);
 const conversation = ref<ConversationProps>()
 let conversationId = parseInt(route.params.id as string);
-filteredMessages.value = messages.filter(message => message.conversationId === conversationId)
-conversation.value = conversations.find(item => item.id === conversationId)
-watch(() => route.params.id, (newId: string) => {
+const initMessageId = parseInt(route.query.init as string);
+const creatingInitialMessage = async () => {
+    const createdData: Omit<MessageProps, 'id'> = {
+        content: '',
+        conversationId,
+        type: 'answer',
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        status: 'loading'
+    }
+    const newMessageId = await db.messages.add(createdData);
+    filteredMessages.value.push({ id: newMessageId, ...createdData })
+}
+watch(() => route.params.id, async (newId: string) => {
     conversationId = parseInt(newId);
-    filteredMessages.value = messages.filter(message => message.conversationId === conversationId)
-    conversation.value = conversations.find(item => item.id === conversationId)
+    conversation.value = await db.conversations.where({ id: conversationId }).first()
+    filteredMessages.value = await db.messages.where({ conversationId }).toArray()
+})
+
+onMounted(async () => {
+    conversation.value = await db.conversations.where({ id: conversationId }).first()
+    filteredMessages.value = await db.messages.where({ conversationId }).toArray()
+    if (initMessageId) {
+        await creatingInitialMessage()
+    }
 })
 </script>

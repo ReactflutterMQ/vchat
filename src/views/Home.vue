@@ -49,5 +49,8 @@ const createConversation = async (question: string) => {
         type: 'question'
     })
     router.push(`/conversation/${conversationId}?init=${newMessageId}`)
+    // * 解决 Date 的格式问题
+    // * 解决 Conversation 页面的数据获取
+    // * 解决 init 的时候需要添加一条新的信息
 }
 </script>

@@ -45,6 +45,7 @@
   },
   "dependencies": {
     "@baiducloud/qianfan": "^0.1.9",
+    "dayjs": "^1.11.20",
     "dexie": "^4.3.0",
     "dotenv": "^16.4.7",
     "electron-squirrel-startup": "^1.0.1",
