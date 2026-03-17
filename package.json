@@ -50,6 +50,7 @@
     "dotenv": "^16.4.7",
     "electron-squirrel-startup": "^1.0.1",
     "openai": "^4.55.3",
+    "pinia": "^3.0.4",
     "radix-vue": "^1.9.17",
     "vue": "^3.5.27",
     "vue-router": "^4.6.4"
