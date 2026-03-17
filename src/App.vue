@@ -47,7 +47,7 @@ onMounted(async () => {
     // const items = await db.providers.where({ id: 1 }).toArray();//查询id为1得数据
     // console.log('items', items);
     // 更新
-    // const updatedItem = await db.providers.update(1, { desc: 'updated desc' });
+    // const updatedItem = await db.providers.update(1, { models: ['ERNIE-4.0-8K', 'ERNIE-3.5-8K', 'ERNIE-Speed-Pro-128K'] });
     // console.log('updatedItem', updatedItem);//返回索引1
     // 删除
     // const deletedItem = await db.providers.delete(1);

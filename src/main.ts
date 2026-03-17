@@ -1,11 +1,13 @@
-import { app, BrowserWindow, globalShortcut, Menu } from 'electron';
+import { app, BrowserWindow, globalShortcut, ipcMain, Menu } from 'electron';
 import path from 'path';
 import started from 'electron-squirrel-startup';
 import { ChatCompletion } from '@baiducloud/qianfan';
 import OpenAI from 'openai';
 // import fs from 'fs/promises';
 import fs from 'fs';
+import { CreateChatProps } from './types';
 import 'dotenv/config';
+import { messages } from './testData';
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (started) {
@@ -21,7 +23,31 @@ const createWindow = async () => {
       preload: path.join(__dirname, 'preload.js'),
     },
   });
-  
+  ipcMain.on('start-chat', async (event, data: CreateChatProps) => {
+    console.log('hey', data);
+    const { providerName, content, messageId, selectedModel } = data;
+    if (providerName === 'qianfan') {
+      const client = new ChatCompletion()
+      const stream = await client.chat({
+        messages: [
+          { role: 'user', content }
+        ],
+        stream: true
+      }, selectedModel);
+      for await (const chunk of stream) {
+        const { is_end, result } = chunk;
+        const content = {
+          messageId,
+          data: {
+            is_end,
+            result
+          }
+        }
+        mainWindow.webContents.send('update-message', content); // 发送消息到渲染进程
+      }
+    }
+  })
+
   // and load the index.html of the app.
   if (MAIN_WINDOW_VITE_DEV_SERVER_URL) {
     mainWindow.loadURL(MAIN_WINDOW_VITE_DEV_SERVER_URL);

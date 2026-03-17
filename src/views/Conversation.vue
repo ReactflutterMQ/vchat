@@ -25,6 +25,7 @@ const filteredMessages = ref<MessageProps[]>([]);
 const conversation = ref<ConversationProps>()
 let conversationId = parseInt(route.params.id as string);
 const initMessageId = parseInt(route.query.init as string);
+let lastQuestion = ''
 const creatingInitialMessage = async () => {
     const createdData: Omit<MessageProps, 'id'> = {
         content: '',
@@ -36,18 +37,33 @@ const creatingInitialMessage = async () => {
     }
     const newMessageId = await db.messages.add(createdData);
     filteredMessages.value.push({ id: newMessageId, ...createdData })
+    if (conversation.value) {
+        const provider = await db.providers.where({ id: conversation.value.providerId }).first()
+        if (provider) {
+            await window.electronAPI.startChat({
+                messageId: newMessageId,
+                providerName: provider.name,
+                selectedModel: conversation.value.selectedModel,
+                content: lastQuestion
+            })
+        }
+    }
 }
 watch(() => route.params.id, async (newId: string) => {
     conversationId = parseInt(newId);
     conversation.value = await db.conversations.where({ id: conversationId }).first()
     filteredMessages.value = await db.messages.where({ conversationId }).toArray()
 })
-
 onMounted(async () => {
     conversation.value = await db.conversations.where({ id: conversationId }).first()
     filteredMessages.value = await db.messages.where({ conversationId }).toArray()
     if (initMessageId) {
+        const lastMessage = await db.messages.where({ conversationId }).last()
+        lastQuestion = lastMessage?.content || ''
         await creatingInitialMessage()
     }
+    window.electronAPI.onUpdateMessage((streamData) => {
+        console.log('stream', streamData); //
+    })
 })
 </script>
