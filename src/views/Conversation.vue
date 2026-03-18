@@ -12,24 +12,25 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref, watch } from 'vue';
+import { computed, onMounted, ref, watch } from 'vue';
 import { useRoute } from 'vue-router';
 import { db } from '../db';
 import dayjs from 'dayjs';
 import MessageInput from '../components/MessageInput.vue';
 import MessageList from '../components/MessageList.vue';
+import { useConversationStore } from '../stores/conversation';
 import { ConversationProps, MessageProps, MessageStatus } from '../types';
-import { messages, conversations } from '../testData';
 const route = useRoute();
+const conversationStore = useConversationStore();
 const filteredMessages = ref<MessageProps[]>([]);
-const conversation = ref<ConversationProps>()
-let conversationId = parseInt(route.params.id as string);
+const conversationId = ref(parseInt(route.params.id as string));
 const initMessageId = parseInt(route.query.init as string);
+const conversation = computed(() => conversationStore.getConversationById(conversationId.value))
 let lastQuestion = ''
 const creatingInitialMessage = async () => {
     const createdData: Omit<MessageProps, 'id'> = {
         content: '',
-        conversationId,
+        conversationId: conversationId.value,
         type: 'answer',
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
@@ -50,15 +51,15 @@ const creatingInitialMessage = async () => {
     }
 }
 watch(() => route.params.id, async (newId: string) => {
-    conversationId = parseInt(newId);
-    conversation.value = await db.conversations.where({ id: conversationId }).first()
-    filteredMessages.value = await db.messages.where({ conversationId }).toArray()
+    conversationId.value = parseInt(newId);
+    // conversation.value = await db.conversations.where({ id: conversationId.value }).first()
+    filteredMessages.value = await db.messages.where({ conversationId: conversationId.value }).toArray()
 })
 onMounted(async () => {
-    conversation.value = await db.conversations.where({ id: conversationId }).first()
-    filteredMessages.value = await db.messages.where({ conversationId }).toArray()
+    // conversation.value = await db.conversations.where({ id: conversationId }).first()
+    filteredMessages.value = await db.messages.where({ conversationId: conversationId.value }).toArray()
     if (initMessageId) {
-        const lastMessage = await db.messages.where({ conversationId }).last()
+        const lastMessage = await db.messages.where({ conversationId: conversationId.value }).last()
         lastQuestion = lastMessage?.content || ''
         await creatingInitialMessage()
     }

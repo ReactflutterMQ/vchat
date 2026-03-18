@@ -3,6 +3,7 @@
         <div class=" w-[300px] bg-gray-200 h-full border-r border-gray-300">
             <div class="h-[92%] overflow-y-auto">
                 <ConversationList :items="items" />
+                {{ totalNumber }}
             </div>
             <div class="h-[8%] grid grid-cols-2 gap-2 p-2">
                 <RouterLink to="/">
@@ -19,18 +20,6 @@
                         应用设置
                     </button>
                 </RouterLink>
-                <button
-                    @click="testAdd"
-                    class="shadow-sm inline-flex items-center justify-center bg-green-700 text-white hover:bg-green-700/90 border border-green-700 h-[32px] py-[8px] px-[15px] text-sm rounded-[4px]">
-                    <Icon icon="radix-icons:chat-bubble" class="mr-2" />
-                    测试新增
-                </button>
-                <button
-                    @click="testReset"
-                    class="shadow-sm inline-flex items-center justify-center bg-green-700 text-white hover:bg-green-700/90 border border-green-700 h-[32px] py-[8px] px-[15px] text-sm rounded-[4px]">
-                    <Icon icon="radix-icons:chat-bubble" class="mr-2" />
-                    测试Reset
-                </button>
             </div>
         </div>
         <div class="h-full flex-1">
@@ -42,24 +31,16 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue';
 import { Icon } from '@iconify/vue';
-import { db, initProviders } from './db';
-import { conversations } from './testData';
+import { initProviders } from './db';
 import { useConversationStore } from './stores/conversation';
 import ConversationList from './components/ConversationList.vue';
 const conversationStore = useConversationStore();
 const items = computed(() => conversationStore.items);
+const totalNumber = computed(() => conversationStore.totalNumber);
 
-let index = 0;
-const testAdd = () => {
-    index++;
-    conversationStore.items.push(conversations[index])
-}
-const testReset = () => {//恢复到初始状态
-    conversationStore.$reset();
-}
 onMounted(async () => {
     await initProviders();
-    conversationStore.items = await db.conversations.toArray();
+    conversationStore.fetchConversations();
 
     // 增加测试数据
     // const insertedId = await db.providers.add(providers[0]);

@@ -1,1 +1,5 @@
 chcp 65001
+
+yarn add pinia
+# 或者使用 npm
+npm install pinia

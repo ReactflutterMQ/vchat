@@ -12,6 +12,7 @@
     "outDir": "dist",
     "moduleResolution": "node",
     // "moduleResolution": "bundler",
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
+    "noImplicitThis": true
   }
 }
