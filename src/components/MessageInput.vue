@@ -1,6 +1,6 @@
 <template>
     <div class="message-input w-full background-gray-100 border flex gap-10 justify-between shadow-sm focus-within:border-green-700 py-1 px-2 rounded-[4px]">
-        <input type="text" class="outline-none flex-1" v-model="model"><!-- rounded-lg -->
+        <input type="text" class="outline-none flex-1" v-model="model" @keyup.enter="onCreate"><!-- rounded-lg -->
         <!-- <Button icon-name="radix-icons:paper-plane" @click="onCreate" :disabled="disabled">
             {{ t('common.send') }}
         </Button> -->
