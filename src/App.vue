@@ -31,7 +31,7 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue';
 import { Icon } from '@iconify/vue';
-import { initProviders } from './db';
+import { db, initProviders } from './db';
 import { useConversationStore } from './stores/conversation';
 import ConversationList from './components/ConversationList.vue';
 const conversationStore = useConversationStore();
