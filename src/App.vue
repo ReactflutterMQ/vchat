@@ -1,6 +1,6 @@
 <template>
     <div class=" flex items-center justify-between h-screen">
-        <div class=" w-[300px] bg-gray-200 h-full border-r border-gray-300">
+        <div class=" w-[300px] bg-[#edf2fa] h-full border-r border-gray-300"><!-- bg-gray-200 -->
             <div class="h-[92%] overflow-y-auto">
                 <ConversationList :items="items" />
                 {{ totalNumber }}
@@ -25,6 +25,8 @@
         <div class="h-full flex-1">
             <RouterView />
         </div>
+        <!-- 消息提示组件 -->
+        <MessageContainer />
     </div>
 </template>
 
@@ -34,6 +36,7 @@ import { Icon } from '@iconify/vue';
 import { db, initProviders } from './db';
 import { useConversationStore } from './stores/conversation';
 import ConversationList from './components/ConversationList.vue';
+import MessageContainer from './components/Message/MessageContainer.vue';
 const conversationStore = useConversationStore();
 const items = computed(() => conversationStore.items);
 const totalNumber = computed(() => conversationStore.totalNumber);

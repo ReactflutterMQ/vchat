@@ -51,8 +51,9 @@ const creatingInitialMessage = async () => {
         }
     }
 }
-watch(() => route.params.id, async (newId: string) => {
-    conversationId.value = parseInt(newId);
+watch(() => route.params.id, async (newId: string | string[]) => {
+    const id = Array.isArray(newId) ? newId[0] : newId
+    conversationId.value = parseInt(id)
     await messageStore.fetchMessagesByConversation(conversationId.value)
 })
 onMounted(async () => {

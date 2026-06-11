@@ -24,6 +24,11 @@ export const useConversationStore = defineStore('conversation', {
                 ...createdData
             })
             return newCId;
+        },
+        async deleteConversation(id: number) {//根据id删除对话
+            const deletedBack = await db.conversations.delete(id);
+            this.fetchConversations();
+            return deletedBack;//返回undefined，说明删除成功
         }
     },
     getters: {
