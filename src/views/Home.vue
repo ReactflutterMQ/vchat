@@ -5,7 +5,7 @@
         </div>
         <div class="h-[15%] flex items-center">
             <!-- Message Input -->
-            <MessageInput @create="createConversation" />
+            <MessageInput @create="createConversation" :disabled="!currentProvider" />
         </div>
     </div>
 </template>

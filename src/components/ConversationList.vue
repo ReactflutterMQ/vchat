@@ -1,7 +1,14 @@
 <template>
     <div class="conversation-list">
-        <div class="item border-gray-300 border-t cursor-pointer bg-white hover:bg-gray-200 p-2" v-for="item in items"
-            :key="item.id" @click="goToConversation(item.id)"><!-- @click="toConversation" -->
+        <div 
+            class="item border-gray-300 border-t cursor-pointer p-2"
+            :class="{
+                'bg-gray-100 hover:bg-gray-300': conversationStore.selectedId === item.id,
+                'bg-white hover:bg-gray-200': conversationStore.selectedId !== item.id
+            }" 
+            v-for="item in items"
+            :key="item.id" @click="goToConversation(item.id)"
+        >
             <a href="#"><!-- @click.prevent="goToConversation(item.id)" -->
                 <div class=" flex justify-between items-center text-sm leading-5 text-gray-500">
                     <span>{{ item.selectedModel }}</span>
@@ -69,22 +76,15 @@ const message = useMessage();
 const deleteTipVisulable = ref<Boolean>(false)
 const conversationStore = useConversationStore();
 const goToConversation = (id: number) => {
-    // console.log('goToConversation', deleteTipVisulable.value);
-    // if (deleteTipVisulable.value) return
-    router.push({ path: `/conversation/${id}`, query: { name: 'viking' }, hash: '#foo' })
+    router.push({ path: `/conversation/${id}` })
+    conversationStore.selectedId = id;
 }
-// const showDeleteTip = (event: MouseEvent) => {
-//     deleteTipVisulable.value = !deleteTipVisulable.value
-//     // event.stopPropagation()
-//     // console.log('showDeleteTip', deleteTipVisulable.value);
-// }
 const confirmDelete = async (item: ConversationProps) => {//确认删除这条会话记录
     const { id } = item
-    console.log('---item---', item);
+    // console.log('---item---', item);
     const res = await conversationStore.deleteConversation(id)
     if (res === undefined) {
         message.success('删除成功！')
-        
     } else {
         message.error('删除失败！')
     }
