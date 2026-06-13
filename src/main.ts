@@ -25,13 +25,11 @@ const createWindow = async () => {
   });
   ipcMain.on('start-chat', async (event, data: CreateChatProps) => {
     console.log('hey', data);
-    const { providerName, content, messageId, selectedModel } = data;
+    const { providerName, messages, messageId, selectedModel } = data;
     if (providerName === 'qianfan') {
       const client = new ChatCompletion()
       const stream = await client.chat({
-        messages: [
-          { role: 'user', content }
-        ],
+        messages,
         stream: true
       }, selectedModel);
       for await (const chunk of stream) {
@@ -51,9 +49,7 @@ const createWindow = async () => {
           baseURL: 'https://dashscope.aliyuncs.com/compatible-mode/v1'
       })
       const stream = await client.chat.completions.create({
-        messages: [
-            { role: 'user', content }
-        ],
+        messages: messages as { role: 'user' | 'assistant', content: string }[],
         model: selectedModel,
         stream: true
       })

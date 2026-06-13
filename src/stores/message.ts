@@ -28,9 +28,10 @@ export const useMessageStore = defineStore('message', {
             const currentMessage = await db.messages.where({ id: messageId }).first()
             if (currentMessage) {
                 const updateData = {
-                    content: currentMessage.content + data.result,
+                    // content: currentMessage.content + data.result,
                     status: data.is_end ? 'finished' : 'streaming' as MessageStatus,
-                    updatedAt: dayjs(new Date().toISOString()).format('YYYY-MM-DD HH:mm:ss')
+                    updatedAt: dayjs(new Date().toISOString()).format('YYYY-MM-DD HH:mm:ss'),
+                    ...(!data.is_end && { content: currentMessage.content + data.result })
                 }
                 await db.messages.update(messageId, updateData)
                 const index = this.items.findIndex(item => item.id === messageId)
