@@ -11,9 +11,10 @@
                         <template v-if="message.status === 'loading'">
                             <Icon icon="eos-icons:three-dots-loading" width="24" height="24" />
                         </template>
-                        <template v-else>
-                            {{ message.content }}
-                        </template>
+                        <div v-else class="prose prose-slate prose-headings:my-2 prose-li:my-0 prose-ul:my-1 prose-pre:p-0">
+                            <vue-markdown :source="message.content" :plugins="plugins" />
+                            <!-- {{ message.content }} -->
+                        </div>
                     </div>
                 </div>
             </div>
@@ -25,5 +26,8 @@
 import dayjs from 'dayjs';
 import { Icon } from '@iconify/vue';
 import { MessageProps } from '../types';
+import VueMarkdown from 'vue-markdown-render'
+import markdownItHighlightjs from 'markdown-it-highlightjs';
 defineProps<{ messages: MessageProps[] }>()
+const plugins = [ markdownItHighlightjs ]
 </script>

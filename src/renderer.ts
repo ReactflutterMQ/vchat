@@ -35,6 +35,7 @@ import Home from './views/Home.vue';
 import Conversation from './views/Conversation.vue';
 import Settings from './views/Settings.vue';
 import './index.css';
+import 'highlight.js/styles/github-dark.css';
 
 const routes = [
   { path: '/', component: Home },
