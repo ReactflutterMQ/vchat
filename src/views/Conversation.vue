@@ -20,7 +20,7 @@ import MessageInput from '../components/MessageInput.vue';
 import MessageList from '../components/MessageList.vue';
 import { useConversationStore } from '../stores/conversation';
 import { useMessageStore } from '../stores/message';
-import { MessageProps, MessageListInstance } from '../types';
+import { MessageProps, MessageListInstance, MessageStatus } from '../types';
 const route = useRoute();
 const inputValue = ref('');
 const messageStore = useMessageStore();
@@ -31,8 +31,10 @@ const sendMessages = computed(() => filteredMessages.value
     .filter(messages => messages.status !== 'loading')
     .map(messages => {
         return {
-            role: messages.type === 'question' ? 'user' : 'assistant',
-            content: messages.content
+            role: messages.type
+             === 'question' ? 'user' : 'assistant',
+            content: messages.content,
+            ...(messages.imagePath && { imagePath: messages.imagePath })
         }
     })
 )
@@ -40,8 +42,17 @@ const conversationId = ref(parseInt(route.params.id as string));
 const initMessageId = parseInt(route.query.init as string);
 const conversation = computed(() => conversationStore.getConversationById(conversationId.value))
 const lastQuestion = computed(() => messageStore.getLastQuestion(conversationId.value))
-const sendNewMessage = async (question: string) => {
+const sendNewMessage = async (question: string, imagePath?: string) => {
     if (question) {
+        let copiedImagePath: string | undefined
+        if (imagePath) {
+            try {
+                copiedImagePath = await window.electronAPI.copyImageToUserDir(imagePath)
+                console.log('copiedImagePath:', copiedImagePath);
+            } catch (error) {
+                console.error('Failed to copy image:', error)
+            }
+        }
         const date = new Date().toISOString()
         await messageStore.createMessage({
             content: question,
@@ -49,6 +60,7 @@ const sendNewMessage = async (question: string) => {
             createdAt: date,
             updatedAt: date,
             type: 'question',
+            ...(copiedImagePath && { imagePath: copiedImagePath })
         })
         inputValue.value = ''
         creatingInitialMessage()
@@ -97,6 +109,7 @@ onMounted(async () => {
         await creatingInitialMessage()
     }
     let currentMessageListHeight = 0
+    let streamContent = ''
     const checkAndScrollToBottom = async () => {
         const newHeight = messageListRef.value?.ref.clientHeight || 0
         // console.log('the newHeight', newHeight);
@@ -109,12 +122,21 @@ onMounted(async () => {
     }
     window.electronAPI.onUpdateMessage(async (streamData) => {
         console.log('stream', streamData)
+        const { messageId, data } = streamData
+        streamContent += data.result
+        const updateData = {
+            content: streamContent,
+            status: data.is_end ? 'finished' : 'streaming' as MessageStatus,
+            updatedAt: dayjs(new Date().toISOString()).format('YYYY-MM-DD HH:mm:ss')
+        }
         // update database
         // update filteredMessages
-        messageStore.updateMessage(streamData)
-        // await messageScrollToBottom()
+        await messageStore.updateMessage(messageId, updateData)
         await nextTick()
         checkAndScrollToBottom()
+        if (data.is_end) {
+            streamContent = ''
+        }
     })
 })
 </script>

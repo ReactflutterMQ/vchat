@@ -1,11 +1,14 @@
-import { app, BrowserWindow, globalShortcut, ipcMain, Menu } from 'electron';
+import { app, BrowserWindow, globalShortcut, ipcMain, Menu, protocol, net } from 'electron';
+import url from 'url';
 import path from 'path';
 import started from 'electron-squirrel-startup';
 import { ChatCompletion } from '@baiducloud/qianfan';
 import OpenAI from 'openai';
 // import fs from 'fs/promises';
-import fs from 'fs';
+import fs from 'fs/promises';
+import { lookup } from 'mime-types';
 import { CreateChatProps } from './types';
+import { convertMessages } from './helper';
 import 'dotenv/config';
 import { messages } from './testData';
 
@@ -23,13 +26,35 @@ const createWindow = async () => {
       preload: path.join(__dirname, 'preload.js'),
     },
   });
+  // protocol.handle('safe-file', async (request) => {
+  //   console.log('request.url', request.url)
+  //   const filePath = decodeURIComponent(request.url.slice('safe-file://'.length));
+  //   console.log('filePath', filePath);
+  //   const data = await fs.readFile(filePath);
+  //   return new Response(data, {
+  //     status: 200,
+  //     headers: {
+  //       'Content-Type': lookup(filePath) as string
+  //     }
+  //   })
+  // })
+  ipcMain.handle('copy-image-to-user-dir', async (event, sourcePath: string) => {
+    const userDataPath = app.getPath('userData');
+    const imagesDir = path.join(userDataPath, 'images');
+    await fs.mkdir(imagesDir, { recursive: true });
+    const fileName = path.basename(sourcePath);
+    const destPath = path.join(imagesDir, fileName);
+    await fs.copyFile(sourcePath, destPath);
+    return destPath;
+  })
   ipcMain.on('start-chat', async (event, data: CreateChatProps) => {
     console.log('hey', data);
     const { providerName, messages, messageId, selectedModel } = data;
+    const convertedMessages = await convertMessages(messages);
     if (providerName === 'qianfan') {
       const client = new ChatCompletion()
       const stream = await client.chat({
-        messages,
+        messages: convertedMessages,
         stream: true
       }, selectedModel);
       for await (const chunk of stream) {
@@ -49,7 +74,7 @@ const createWindow = async () => {
           baseURL: 'https://dashscope.aliyuncs.com/compatible-mode/v1'
       })
       const stream = await client.chat.completions.create({
-        messages: messages as { role: 'user' | 'assistant', content: string }[],
+        messages: convertedMessages as { role: 'user' | 'assistant', content: string }[],
         model: selectedModel,
         stream: true
       })
@@ -101,6 +126,42 @@ app.on('window-all-closed', () => {
     app.quit();
   }
 });
+
+protocol.registerSchemesAsPrivileged([
+  {
+    scheme: 'safe-file',
+    privileges: {
+      standard: true,
+      secure: true,
+      supportFetchAPI: true,
+    },
+  },
+]);
+app.whenReady().then(async () => {
+  // protocol.handle('safe-file', async (request) => {
+  //   console.log('request.url', request.url)
+  //   const filePath = decodeURIComponent(request.url.slice('safe-file://'.length));
+  //   console.log('filePath', filePath);
+  //   const data = await fs.readFile(filePath);
+  //   return new Response(data, {
+  //     status: 200,
+  //     headers: {
+  //       'Content-Type': lookup(filePath) as string
+  //     }
+  //   })
+  // })
+  protocol.handle('safe-file', async (request) => {
+    const userDataPath = app.getPath('userData')
+    const imageDir = path.join(userDataPath, 'images')
+    const filePath = path.join(
+      decodeURIComponent(request.url.slice('safe-file:/'.length))
+    )
+    const filename = path.basename(filePath)
+    const fileAddr = path.join(imageDir, filename)
+    const newFilePath = url.pathToFileURL(fileAddr).toString()
+    return net.fetch(newFilePath)
+  })
+})
 
 app.on('activate', () => {
   // On OS X it's common to re-create a window in the app when the
