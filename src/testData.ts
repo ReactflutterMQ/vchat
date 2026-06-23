@@ -1,17 +1,18 @@
 import { ProviderProps, ConversationProps, MessageProps } from "./types";
 
 export const providers: ProviderProps[] = [
-  {     
+  {
     id: 1,
     name: 'qianfan',
     title: '百度千帆',
     desc: '文心一言 百度出品的大模型',
     models: ['ERNIE-4.0-8K', 'ERNIE-3.5-8K', 'ERNIE-Speed-Pro-128K'],
+    // avatar: 'https://aip-static.cdn.bcebos.com/landing/product/ernie-bote321e5.png',
     avatar: 'https://aip-static.cdn.bcebos.com/landing/product/ernie-bote321e5.png',
     createdAt: '2024-07-03',
     updatedAt: '2024-07-03'
   },
-  {     
+  {
     id: 2,
     name: 'dashscope', 
     title: '阿里灵积',
@@ -28,7 +29,7 @@ export const providers: ProviderProps[] = [
     title: 'DeepSeek',
     desc: 'DeepSeek',
     // https://api-docs.deepseek.com/zh-cn/
-    models: ['deepseek-chat'],
+    models: ['deepseek-chat', 'deepseek-v4-flash', 'deepSeek-v4-pro'],
     avatar: 'https://qph.cf2.poecdn.net/main-thumb-pb-4981273-200-phhqenmywlkiybehuaqvsxpfekviajex.jpeg',
     createdAt: '2024-12-27',
     updatedAt: '2024-12-27'

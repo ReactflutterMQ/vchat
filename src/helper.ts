@@ -16,7 +16,7 @@ export async function convertMessages( messages: { role: string, content: string
             convertedContent = [
                 {
                     type: 'text',
-                    text: message.content
+                    text: message.content || ""
                 },
                 {
                     type: 'image_url',

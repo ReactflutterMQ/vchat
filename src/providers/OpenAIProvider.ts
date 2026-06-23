@@ -1,6 +1,7 @@
 import OpenAI from 'openai';
 import { BaseProvider } from './BaseProvider';
 import { ChatMessageProps, UniversalChunkProps } from '../types';
+import { convertMessages } from '../helper';
 
 /**
  * OpenAIProvider 类，继承自 BaseProvider，用于与 OpenAI API 进行交互
@@ -19,9 +20,11 @@ export class OpenAIProvider extends BaseProvider {
         this.client = new OpenAI({ apiKey, baseURL }); // 初始化 OpenAI 客户端
     }
     async chat(messages: ChatMessageProps[], model: string) {
+        const convertedMessages = await convertMessages(messages);
         const stream = await this.client.chat.completions.create({
             model,
-            messages,
+            messages: convertedMessages as any,
+            // messages: messages as any,
             stream: true
         })
         const self = this;

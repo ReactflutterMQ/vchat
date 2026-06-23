@@ -1,6 +1,6 @@
 <template>
-    <div class="settings">
-        <h1>Settings</h1>
+    <div class="settings-page">
+        <h1 class="settings-title flex justify-center items-center">this is the settings page</h1>
     </div>
 </template>
 
