@@ -10,14 +10,16 @@
                     <button
                         class="shadow-sm inline-flex items-center justify-center bg-green-700 text-white hover:bg-green-700/90 border border-green-700 h-[32px] py-[8px] px-[15px] text-sm rounded-[4px]">
                         <Icon icon="radix-icons:chat-bubble" class="mr-2" />
-                        新建聊天
+                        <!-- 新建聊天 -->
+                        {{ t('common.newChat') }}
                     </button>
                 </RouterLink>
                 <RouterLink to="/settings">
                     <button
                         class="shadow-sm inline-flex items-center justify-center bg-green-50 text-green-700 hover:bg-green-700 border border-green-700 hover:text-white h-[32px] py-[8px] px-[15px] text-sm rounded-[4px]">
                         <Icon icon="radix-icons:gear" class="mr-2" />
-                        应用设置
+                        <!-- 应用设置 -->
+                        {{ t('common.settings') }}
                     </button>
                 </RouterLink>
             </div>
@@ -32,11 +34,14 @@
 
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { Icon } from '@iconify/vue';
 import { db, initProviders } from './db';
 import { useConversationStore } from './stores/conversation';
 import ConversationList from './components/ConversationList.vue';
 import MessageContainer from './components/Message/MessageContainer.vue';
+
+const { t } = useI18n();
 const conversationStore = useConversationStore();
 const items = computed(() => conversationStore.items);
 const totalNumber = computed(() => conversationStore.totalNumber);

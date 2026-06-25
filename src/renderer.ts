@@ -36,6 +36,7 @@ import Conversation from './views/Conversation.vue';
 import Settings from './views/Settings.vue';
 import './index.css';
 import 'highlight.js/styles/github-dark.css';
+import { i18n } from './i18n';
 
 const routes = [
   { path: '/', component: Home },
@@ -59,4 +60,4 @@ const pinia = createPinia();
 console.log(
   '👋 This message is being logged by "renderer.ts", included via Vite',
 );
-createApp(App).use(router).use(pinia).mount('#app');
+createApp(App).use(router).use(pinia).use(i18n).mount('#app');

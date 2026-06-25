@@ -6,6 +6,7 @@ import { ChatCompletion } from '@baiducloud/qianfan';
 import OpenAI from 'openai';
 // import fs from 'fs/promises';
 import fs from 'fs/promises';
+import util from 'util';
 import { lookup } from 'mime-types';
 import { CreateChatProps } from './types';
 import { convertMessages } from './helper';
@@ -21,7 +22,9 @@ if (started) {
 
 const createWindow = async () => {
   // 初始化配置
-  await configManager.load();
+  // await configManager.load();
+  const config = await configManager.load();
+  console.log('config', util.inspect(config, { depth: null, colors: true }));
 
   // Create the browser window.
   const mainWindow = new BrowserWindow({
@@ -31,18 +34,6 @@ const createWindow = async () => {
       preload: path.join(__dirname, 'preload.js'),
     },
   });
-  // protocol.handle('safe-file', async (request) => {
-  //   console.log('request.url', request.url)
-  //   const filePath = decodeURIComponent(request.url.slice('safe-file://'.length));
-  //   console.log('filePath', filePath);
-  //   const data = await fs.readFile(filePath);
-  //   return new Response(data, {
-  //     status: 200,
-  //     headers: {
-  //       'Content-Type': lookup(filePath) as string
-  //     }
-  //   })
-  // })
 
   // 添加配置相关的 IPC 处理程序
   ipcMain.handle('get-config', () => {
@@ -65,16 +56,33 @@ const createWindow = async () => {
   ipcMain.on('start-chat', async (event, data: CreateChatProps) => {
     console.log('hey', data);
     const { providerName, messages, messageId, selectedModel } = data;
-    // const convertedMessages = await convertMessages(messages);
-    const provider = createProvider(providerName);
-    const stream = await provider.chat(messages, selectedModel)
-    for await (const chunk of stream) {
-      const content = {
-        messageId,
-        data: chunk
+    
+    try {
+      // const convertedMessages = await convertMessages(messages);
+      const provider = createProvider(providerName);
+      const stream = await provider.chat(messages, selectedModel)
+      for await (const chunk of stream) {
+        const content = {
+          messageId,
+          data: chunk
+        }
+        mainWindow.webContents.send('update-message', content); // 发送消息到渲染进程
       }
-      mainWindow.webContents.send('update-message', content); // 发送消息到渲染进程
+    } catch (error) {
+      console.log('Chat error:', error);
+      const errorContent = {
+        messageId,
+        data: {
+          is_end: true,
+          result: error instanceof Error ? error.message : '与AI服务通信时发生错误',
+          is_error: true
+        }
+      }
+      mainWindow.webContents.send('update-message', errorContent); // 发送消息到渲染进程
     }
+
+    
+    
   })
 
   // and load the index.html of the app.

@@ -28,7 +28,7 @@ const conversationStore = useConversationStore();
 const messageListRef = ref<MessageListInstance>();
 const filteredMessages = computed(() => messageStore.items)
 const sendMessages = computed(() => filteredMessages.value
-    .filter(messages => messages.status !== 'loading')
+    .filter(messages => messages.status !== 'loading' && messages.status !== 'error')
     .map(messages => {
         return {
             role: messages.type
@@ -124,9 +124,18 @@ onMounted(async () => {
         console.log('stream', streamData)
         const { messageId, data } = streamData
         streamContent += data.result
+        const getMessageStatus = (data: any): MessageStatus => {
+            if (data.is_error) {
+                return 'error'
+            } else if (data.is_end) {
+                return 'finished'
+            } else {
+                return 'streaming'
+            }
+        }
         const updateData = {
             content: streamContent,
-            status: data.is_end ? 'finished' : 'streaming' as MessageStatus,
+            status: getMessageStatus(data),
             updatedAt: dayjs(new Date().toISOString()).format('YYYY-MM-DD HH:mm:ss')
         }
         // update database

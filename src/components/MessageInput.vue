@@ -14,7 +14,8 @@
             <input type="text" class="outline-none flex-1" v-model="model" @keyup.enter="onCreate" :disabled="disabled">
             <Button icon="radix-icons:paper-plane" @click="onCreate" :disabled="disabled">
                 <template #default>
-                    <span>发送</span>
+                    <!-- <span>发送</span> -->
+                    {{ t('common.send') }}
                 </template>
             </Button>
         </div>
@@ -25,9 +26,12 @@
 import { ref } from 'vue';
 import Button from './Button.vue';
 import { Icon } from '@iconify/vue';
+import { useI18n } from 'vue-i18n';
 defineProps<{
     disabled?: boolean
 }>()
+
+const { t } = useI18n()
 const fileInput = ref<HTMLInputElement | null>(null)
 const imagePreview = ref<string>('')
 const emit = defineEmits<{

@@ -18,7 +18,7 @@ export interface ProviderProps {
     models: string[];
 }
 
-export type MessageStatus = 'loading' | 'streaming' | 'finished';
+export type MessageStatus = 'loading' | 'streaming' | 'finished' | 'error';
 
 export interface MessageProps {
     id: number;
@@ -50,6 +50,7 @@ export interface UpdatedStreamData {
     data: {
         is_end: boolean;
         result: string;
+        is_error?: boolean;
     }
 }
 
@@ -72,9 +73,11 @@ export interface BaiduChunkProps {
 export interface AppConfig {
     language: 'zh' | 'en'
     fontSize: number
+    providerConfigs: Record<string, Record<string, string>>
 }
 
 export const DEFAULT_CONFIG: AppConfig = {
     language: 'zh',
-    fontSize: 14
+    fontSize: 14,
+    providerConfigs: {}
 }

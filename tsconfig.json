@@ -8,12 +8,11 @@
     "esModuleInterop": true,
     "noImplicitAny": true,
     "sourceMap": true,
-    "baseUrl": ".",
+    // "baseUrl": ".",
     "outDir": "dist",
     // "moduleResolution": "node",
     "moduleResolution": "bundler",
     "resolveJsonModule": true,
-    "noImplicitThis": true,
-    "ignoreDeprecations": "6.0"
+    "noImplicitThis": true
   }
 }
