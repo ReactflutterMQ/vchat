@@ -34,7 +34,9 @@
 
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue';
+import { useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
+import { initI18n } from './i18n';
 import { Icon } from '@iconify/vue';
 import { db, initProviders } from './db';
 import { useConversationStore } from './stores/conversation';
@@ -42,11 +44,21 @@ import ConversationList from './components/ConversationList.vue';
 import MessageContainer from './components/Message/MessageContainer.vue';
 
 const { t } = useI18n();
+const router = useRouter()
 const conversationStore = useConversationStore();
 const items = computed(() => conversationStore.items);
 const totalNumber = computed(() => conversationStore.totalNumber);
 
+window.electronAPI.onMenuNewConversation(() => {
+    router.push('/')
+})
+
+window.electronAPI.onMenuOpenSettings(() => {
+    router.push('/settings')
+})
+
 onMounted(async () => {
+    await initI18n()
     await initProviders();
     conversationStore.fetchConversations();
 

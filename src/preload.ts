@@ -10,4 +10,6 @@ contextBridge.exposeInMainWorld("electronAPI", {
     copyImageToUserDir: (sourcePath: string) => ipcRenderer.invoke("copy-image-to-user-dir", sourcePath),//渲染进程向主进程发送异步消息
     getConfig: () => ipcRenderer.invoke("get-config"),//渲染进程向主进程发送异步消息
     updateConfig: (config: Partial<AppConfig>) => ipcRenderer.invoke("update-config", config),//渲染进程向主进程发送异步消息
+    onMenuNewConversation: (callback: () => void) => ipcRenderer.on('menu-new-conversation', () => callback()),//渲染进程监听主进程发送的消息
+    onMenuOpenSettings: (callback: () => void) => ipcRenderer.on('menu-open-settings', () => callback()),//渲染进程监听主进程发送的消息
 })

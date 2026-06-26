@@ -14,6 +14,7 @@ import 'dotenv/config';
 import { messages } from './testData';
 import { createProvider } from './providers/createProvider';
 import { configManager } from './config';
+import { createMenu, updateMenu } from './menu';
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (started) {
@@ -22,9 +23,9 @@ if (started) {
 
 const createWindow = async () => {
   // 初始化配置
-  // await configManager.load();
-  const config = await configManager.load();
-  console.log('config', util.inspect(config, { depth: null, colors: true }));
+  // const config = await configManager.load();
+  // console.log('config', util.inspect(config, { depth: null, colors: true }));
+  await configManager.load();
 
   // Create the browser window.
   const mainWindow = new BrowserWindow({
@@ -35,13 +36,21 @@ const createWindow = async () => {
     },
   });
 
+  createMenu(mainWindow)
+
   // 添加配置相关的 IPC 处理程序
   ipcMain.handle('get-config', () => {
     return configManager.get();
   })
 
   ipcMain.handle('update-config', async (event, newConfig) => {
-    return await configManager.update(newConfig);
+    // return await configManager.update(newConfig);
+    const updatedConfig = await configManager.update(newConfig);
+    // 如果语言发生变化，更新菜单
+    if (newConfig.language) {
+      updateMenu(mainWindow);
+    }
+    return updatedConfig;
   })
 
   ipcMain.handle('copy-image-to-user-dir', async (event, sourcePath: string) => {
